@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+    
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    
+    tr:nth-child(even) {
+        background-color: #dddddd;
+    }
+    </style>
+</head>
+<body>
+    <a href="/"> назад </a>
+    <table>
+        <tr>
+            <th>{{column_names.id}}</th>
+            <th>{{column_names.name}}</th>
+            <th>{{column_names.d1}}</th>
+            <th> - </th>
+            <th>{{column_names.d2}}</th>
+        </tr>
+        {% for flow in flows %}
+        <tr>
+        <!-- <li>{{flow.HorizontalDistance}} {{flow.Elevation}}</li> -->
+        <td >{{flow.id}}</td>
+        <td >{{flow.name}}</td>
+        <td >{{flow.d1}}</td>
+        <td > - </td>
+        <td >{{flow.d2}}</td>
+
+    </tr>
+    {% endfor %}
+    </table>
+</body>
