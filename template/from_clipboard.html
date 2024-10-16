@@ -1,0 +1,95 @@
+
+<style>
+    table{
+border-collapse:collapse;
+border:1px solid #000000;
+}
+
+table td{
+border:1px solid #000000;
+}
+</style>
+<a href="/"> назад </a><br><br>
+<a
+href="http://stackoverflow.com/questions/2006468/copy-paste-from-excel-to-a-web-page"
+>http://stackoverflow.com/questions/2006468/copy-paste-from-excel-to-a-web-page</a
+></strong
+>
+</p>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<p>Paste excel data here:</p>
+<textarea name="excel_data" style="width: 250px; height: 150px"></textarea><br />
+<input
+type="button"
+onclick="javascript:generateTable()"
+value="Genereate Table"
+/>
+<br /><br />
+<input
+type="button"
+onclick="javascript:get_clibord()"
+value="Get Clibord"
+/>
+<p>Table data will appear below</p>
+<hr />
+<div id="excel_table"></div>
+
+<script>
+    function get_clibord() {
+        window.navigator.clipboard
+            .readText()
+            .then((data) => callback(data))
+            .catch((err) => console.error('Не удалось скопировать', err));
+    }
+
+    let callback = function(str) {
+        console.log(str);
+        var rows = str.split("\n");
+        out=[];
+        for(var y in rows) {
+            var row=[];
+            var cells = rows[y].split("\t");
+            for(var x in cells) {
+                var v=cells[x].replace('\r','').replace(',','.')
+                row.push(isNaN(parseFloat(v))? v :parseFloat(v))
+            }
+            out.push(row)
+        }
+        console.log(out);
+        console.log( JSON.stringify(out));
+        $.ajax({
+            type: "PUT", 
+            url: "http://127.0.0.1:5000/api1", //localhost Flask
+            data : JSON.stringify(out),
+            contentType: "application/json",
+            success: function(data){
+                    alert(data);    /* выведет "Текст" */
+                },
+            error:function(data){
+                alert("Error "+data);   /* выведет "Ошибка" */
+            }
+        });
+    };
+
+function generateTable() {
+    var data = $('textarea[name=excel_data]').val();
+    console.log(data);
+var rows = data.split("\n");
+
+var table = $('<table />');
+
+for(var y in rows) {
+    var cells = rows[y].split("\t");
+    var row = $('<tr />');
+    for(var x in cells) {
+        row.append('<td>'+cells[x]+'</td>');
+    }
+    table.append(row);
+}
+
+// Insert into DOM
+$('#excel_table').html(table);
+}
+</script>
