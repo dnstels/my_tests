@@ -4,8 +4,6 @@ from typing import OrderedDict
 
 from numpy import nan
 sys.path.append('.')
-from core.models import Flowline, Profile
-
 
 class Model():pass
 
@@ -19,11 +17,8 @@ def get_names(model:Model):
     }
 
 def get_data_flowlines(model:Model):
-#     return {'kg202-205.Flowline_1': Flowline(HorizontalDistance=8198.0, Elevation=80.0, Diameter=426.0, WallThickness=33.0, Temperature=13.1, Roughness=0.1, UCoeffuserAir=3.302208, GeoProfile=[Profile(HorizontalDistance=0.0, Elevation=1019.9999999999997, MeasuredDistance=0.0), Profile(HorizontalDistance=839.0, Elevation=1019.9999999999997, MeasuredDistance=839.0), Profile(HorizontalDistance=1256.0, Elevation=1059.9999999999993, MeasuredDistance=1257.9140723346495), Profile(HorizontalDistance=3026.9999999999977, Elevation=1059.9999999999993, MeasuredDistance=3028.9140723346495), Profile(HorizontalDistance=3707.999999999998, Elevation=1100.0, MeasuredDistance=3711.087803872298), Profile(HorizontalDistance=4166.999999999999, Elevation=1139.9999999999998, MeasuredDistance=4171.827426652888), Profile(HorizontalDistance=4414.999999999998, Elevation=1159.9999999999986, MeasuredDistance=4420.632571294232), Profile(HorizontalDistance=4828.999999999997, Elevation=1159.9999999999986, MeasuredDistance=4834.632571294232), Profile(HorizontalDistance=5560.000000000001, Elevation=1100.0, MeasuredDistance=5568.0908182313015), Profile(HorizontalDistance=6062.999999999998, Elevation=1079.9999999999995, MeasuredDistance=6071.488275515305), Profile(HorizontalDistance=6861.999999999999, Elevation=1079.9999999999995, MeasuredDistance=6870.488275515305), Profile(HorizontalDistance=8197.999999999998, Elevation=1100.0, MeasuredDistance=8206.63796772797)]), 'kg202.Flowline_1': Flowline(HorizontalDistance=1161.0, Elevation=-96.0, Diameter=325.0, WallThickness=26.0, Temperature=13.1, Roughness=0.1, UCoeffuserAir=4.272857, GeoProfile=[Profile(HorizontalDistance=0.0, Elevation=1116.0, MeasuredDistance=0.0), Profile(HorizontalDistance=357.9999999999999, Elevation=1100.0, MeasuredDistance=358.35736353534026), Profile(HorizontalDistance=1160.9999999999998, Elevation=1019.9999999999997, MeasuredDistance=1165.3325800073208)]), 'kg205.Flowline_1': Flowline(HorizontalDistance=11086.0, Elevation=90.0, Diameter=325.0, WallThickness=26.0, Temperature=13.1, Roughness=0.1, UCoeffuserAir=4.272857, GeoProfile=[Profile(HorizontalDistance=0.0, Elevation=929.9999999999999, MeasuredDistance=0.0), Profile(HorizontalDistance=385.99999999999994, Elevation=940.0000000000001, MeasuredDistance=386.12951195162486), Profile(HorizontalDistance=1007.9999999999994, Elevation=944.9999999999991, MeasuredDistance=1008.1496080900052), Profile(HorizontalDistance=1880.0000000000002, Elevation=940.0000000000001, MeasuredDistance=1880.1639428345666), Profile(HorizontalDistance=2700.999999999998, Elevation=959.9999999999994, MeasuredDistance=2701.4075120635744), Profile(HorizontalDistance=3618.999999999997, Elevation=979.9999999999999, MeasuredDistance=3619.6253511409905), 
-# Profile(HorizontalDistance=3878.999999999998, Elevation=999.9999999999992, MeasuredDistance=3880.3934473490963), Profile(HorizontalDistance=4189.0, Elevation=1019.9999999999997, MeasuredDistance=4191.037938689277), Profile(HorizontalDistance=4515.999999999999, Elevation=1039.9999999999998, MeasuredDistance=4518.648988563972), Profile(HorizontalDistance=5159.0, Elevation=1059.9999999999993, MeasuredDistance=5161.959955359969), Profile(HorizontalDistance=5643.999999999998, Elevation=1079.9999999999995, MeasuredDistance=5647.3721513336595), Profile(HorizontalDistance=6757.0, Elevation=1059.9999999999993, MeasuredDistance=6760.551831349424), Profile(HorizontalDistance=8817.999999999996, Elevation=1079.9999999999995, MeasuredDistance=8821.64886933672), Profile(HorizontalDistance=9143.999999999995, Elevation=1079.9999999999995, MeasuredDistance=9147.64886933672), Profile(HorizontalDistance=10170.999999999995, Elevation=1079.9999999999995, MeasuredDistance=10174.64886933672), Profile(HorizontalDistance=11086.0, Elevation=1019.9999999999997, MeasuredDistance=11091.613972271394)])
-# }
-    return {
-        'kg202-205.Flowline_1': {
+    return ( { 'kg202-205.Flowline_1': {
+            'GeometryProfile': '<sixgill.core.flowline_profile.FlowlineGeometryProfile object at 0x0000020588321F40>', 
             'HorizontalDistance': 8197.999999999998, 
             'ElevationDifference': 80.0000000000004, 
             'InnerDiameter': 360.0, 
@@ -32,8 +27,8 @@ def get_data_flowlines(model:Model):
             'AmbientAirTemperature': 13.100000000000023, 
             'UCoeffUserAir': 3.302207673790568, 
             'UCoeffUser': 3.302207673790568
-        }, 
-        'kg202.Flowline_1': {
+        }, 'kg202.Flowline_1': {
+            'GeometryProfile': '<sixgill.core.flowline_profile.FlowlineGeometryProfile object at 0x0000020588321EB0>', 
             'HorizontalDistance': 1160.9999999999998, 
             'ElevationDifference': -96.00000000000036, 
             'InnerDiameter': 273.0, 
@@ -42,17 +37,54 @@ def get_data_flowlines(model:Model):
             'AmbientAirTemperature': 13.100000000000023, 
             'UCoeffUserAir': 4.272856596086583, 
             'UCoeffUser': 4.272856596086583
-        }, 'kg205.Flowline_1': {
-            'HorizontalDistance': 11086.0, 
-            'ElevationDifference': 89.99999999999979, 
-            'InnerDiameter': 273.0, 
-            'WallThickness': 26.0, 
-            'Roughness': 0.09999999999999999, 
-            'AmbientAirTemperature': 13.100000000000023, 
-            'UCoeffUserAir': 4.272856596086583, 
-            'UCoeffUser': 4.272856596086583
+            }, 'kg205.Flowline_1': {
+                'GeometryProfile': '<sixgill.core.flowline_profile.FlowlineGeometryProfile object at 0x000002058835D7F0>', 
+                'HorizontalDistance': 11086.0, 
+                'ElevationDifference': 89.99999999999979, 
+                'InnerDiameter': 273.0, 
+                'WallThickness': 26.0, 
+                'Roughness': 0.09999999999999999, 
+                'AmbientAirTemperature': 13.100000000000023, 
+                'UCoeffUserAir': 4.272856596086583, 
+                'UCoeffUser': 4.272856596086583
             }
-            }
+        },{
+            'kg202-205.Flowline_1': [
+                {'MeasuredDistance': 0.0, 'HorizontalDistance': 0.0, 'Elevation': 1019.9999999999997}, 
+                {'MeasuredDistance': 839.0, 'HorizontalDistance': 839.0, 'Elevation': 1019.9999999999997}, 
+                {'MeasuredDistance': 1257.9140723346495, 'HorizontalDistance': 1256.0, 'Elevation': 1059.9999999999993}, 
+                {'MeasuredDistance': 3028.9140723346495, 'HorizontalDistance': 3026.9999999999977, 'Elevation': 1059.9999999999993}, 
+                {'MeasuredDistance': 3711.087803872298, 'HorizontalDistance': 3707.999999999998, 'Elevation': 1100.0}, 
+                {'MeasuredDistance': 4171.827426652888, 'HorizontalDistance': 4166.999999999999, 'Elevation': 1139.9999999999998}, 
+                {'MeasuredDistance': 4420.632571294232, 'HorizontalDistance': 4414.999999999998, 'Elevation': 1159.9999999999986}, 
+                {'MeasuredDistance': 4834.632571294232, 'HorizontalDistance': 4828.999999999997, 'Elevation': 1159.9999999999986}, 
+                {'MeasuredDistance': 5568.0908182313015, 'HorizontalDistance': 5560.000000000001, 'Elevation': 1100.0}, 
+                {'MeasuredDistance': 6071.488275515305, 'HorizontalDistance': 6062.999999999998, 'Elevation': 1079.9999999999995}, 
+                {'MeasuredDistance': 6870.488275515305, 'HorizontalDistance': 6861.999999999999, 'Elevation': 1079.9999999999995}, 
+                {'MeasuredDistance': 8206.63796772797, 'HorizontalDistance': 8197.999999999998, 'Elevation': 1100.0}], 
+            'kg202.Flowline_1': [
+                {'MeasuredDistance': 0.0, 'HorizontalDistance': 0.0, 'Elevation': 1116.0}, 
+                {'MeasuredDistance': 358.35736353534026, 'HorizontalDistance': 357.9999999999999, 'Elevation': 1100.0}, 
+                {'MeasuredDistance': 1165.3325800073208, 'HorizontalDistance': 1160.9999999999998, 'Elevation': 1019.9999999999997}], 
+            'kg205.Flowline_1': [
+                {'MeasuredDistance': 0.0, 'HorizontalDistance': 0.0, 'Elevation': 929.9999999999999}, 
+                {'MeasuredDistance': 386.12951195162486, 'HorizontalDistance': 385.99999999999994, 'Elevation': 940.0000000000001}, 
+                {'MeasuredDistance': 1008.1496080900052, 'HorizontalDistance': 1007.9999999999994, 'Elevation': 944.9999999999991}, 
+                {'MeasuredDistance': 1880.1639428345666, 'HorizontalDistance': 1880.0000000000002, 'Elevation': 940.0000000000001}, 
+                {'MeasuredDistance': 2701.4075120635744, 'HorizontalDistance': 2700.999999999998, 'Elevation': 959.9999999999994}, 
+                {'MeasuredDistance': 3619.6253511409905, 'HorizontalDistance': 3618.999999999997, 'Elevation': 979.9999999999999}, 
+                {'MeasuredDistance': 3880.3934473490963, 'HorizontalDistance': 3878.999999999998, 'Elevation': 999.9999999999992}, 
+                {'MeasuredDistance': 4191.037938689277, 'HorizontalDistance': 4189.0, 'Elevation': 1019.9999999999997}, 
+                {'MeasuredDistance': 4518.648988563972, 'HorizontalDistance': 4515.999999999999, 'Elevation': 1039.9999999999998}, 
+                {'MeasuredDistance': 5161.959955359969, 'HorizontalDistance': 5159.0, 'Elevation': 1059.9999999999993}, 
+                {'MeasuredDistance': 5647.3721513336595, 'HorizontalDistance': 5643.999999999998, 'Elevation': 1079.9999999999995}, 
+                {'MeasuredDistance': 6760.551831349424, 'HorizontalDistance': 6757.0, 'Elevation': 1059.9999999999993}, 
+                {'MeasuredDistance': 8821.64886933672, 'HorizontalDistance': 8817.999999999996, 'Elevation': 1079.9999999999995}, 
+                {'MeasuredDistance': 9147.64886933672, 'HorizontalDistance': 9143.999999999995, 'Elevation': 1079.9999999999995}, 
+                {'MeasuredDistance': 10174.64886933672, 'HorizontalDistance': 10170.999999999995, 'Elevation': 1079.9999999999995}, 
+                {'MeasuredDistance': 11091.613972271394, 'HorizontalDistance': 11086.0, 'Elevation': 1019.9999999999997}
+            ]})
+        
 
 def get_network(model:Model):
     return [
@@ -116,7 +148,6 @@ def get_constraints(model:Model):
     return {'KG_202': {'GasFlowRate': 0.3000000000001063}, 'KG_205': {'GasFlowRate': 0.40000000000014174}}
 
 def get_simulation(model:Model):
-    # simulation.system
     return {
         'OutletVolumeFlowrateGasStockTank': OrderedDict([('Unit', 'mmsm3/d'), ('KG_202', 0.2999924477547715), ('KG_205', 0.4000000000001426), ('u2-202-205', 0.6999924477544864)]), 
         'OutletMassFlowrateFluid': OrderedDict([('Unit', 'kg/s'), ('KG_205', 3.6886914178956753), ('KG_202', 2.76644891866537), ('u2-202-205', 6.455140336557102)]), 
@@ -126,47 +157,3 @@ def get_simulation(model:Model):
         'SystemTemperatureDifference': OrderedDict([('Unit', 'degC'), ('u2-202-205', 2.5634229813988725), ('KG_205', 5.2068794569511), ('KG_202', 3.6038129900044)]), 
         'SystemOutletPressure': OrderedDict([('Unit', 'bara'), ('KG_202', 151.60039914333154), ('u2-202-205', 148.4502232017729), ('KG_205', 151.61797432694075)])
         }
-def get_profile(model:Model,flowline_name:str):
-    out= {
-        'kg202-205.Flowline_1': [
-            {'MeasuredDistance': 0.0, 'HorizontalDistance': 0.0, 'Elevation': 1019.9999999999997}, 
-            {'MeasuredDistance': 839.0, 'HorizontalDistance': 839.0, 'Elevation': 1019.9999999999997}, 
-            {'MeasuredDistance': 1257.9140723346495, 'HorizontalDistance': 1256.0, 'Elevation': 1059.9999999999993}, 
-            {'MeasuredDistance': 3028.9140723346495, 'HorizontalDistance': 3026.9999999999977, 'Elevation': 1059.9999999999993}, 
-            {'MeasuredDistance': 3711.087803872298, 'HorizontalDistance': 3707.999999999998, 'Elevation': 1100.0}, 
-            {'MeasuredDistance': 4171.827426652888, 'HorizontalDistance': 4166.999999999999, 'Elevation': 1139.9999999999998}, 
-            {'MeasuredDistance': 4420.632571294232, 'HorizontalDistance': 4414.999999999998, 'Elevation': 1159.9999999999986}, 
-            {'MeasuredDistance': 4834.632571294232, 'HorizontalDistance': 4828.999999999997, 'Elevation': 1159.9999999999986}, 
-            {'MeasuredDistance': 5568.0908182313015, 'HorizontalDistance': 5560.000000000001, 'Elevation': 1100.0}, 
-            {'MeasuredDistance': 6071.488275515305, 'HorizontalDistance': 6062.999999999998, 'Elevation': 1079.9999999999995}, 
-            {'MeasuredDistance': 6870.488275515305, 'HorizontalDistance': 6861.999999999999, 'Elevation': 1079.9999999999995}, 
-            {'MeasuredDistance': 8206.63796772797, 'HorizontalDistance': 8197.999999999998, 'Elevation': 1100.0}], 
-        'kg202.Flowline_1': [
-            {'MeasuredDistance': 0.0, 'HorizontalDistance': 0.0, 'Elevation': 1116.0}, 
-            {'MeasuredDistance': 358.35736353534026, 'HorizontalDistance': 357.9999999999999, 'Elevation': 1100.0}, 
-            {'MeasuredDistance': 1165.3325800073208, 'HorizontalDistance': 1160.9999999999998, 'Elevation': 1019.9999999999997}], 
-        'kg205.Flowline_1': [
-            {'MeasuredDistance': 0.0, 'HorizontalDistance': 0.0, 'Elevation': 929.9999999999999}, 
-            {'MeasuredDistance': 386.12951195162486, 'HorizontalDistance': 385.99999999999994, 'Elevation': 940.0000000000001}, 
-            {'MeasuredDistance': 1008.1496080900052, 'HorizontalDistance': 1007.9999999999994, 'Elevation': 944.9999999999991}, 
-            {'MeasuredDistance': 1880.1639428345666, 'HorizontalDistance': 1880.0000000000002, 'Elevation': 940.0000000000001}, 
-            {'MeasuredDistance': 2701.4075120635744, 'HorizontalDistance': 2700.999999999998, 'Elevation': 959.9999999999994}, 
-            {'MeasuredDistance': 3619.6253511409905, 'HorizontalDistance': 3618.999999999997, 'Elevation': 979.9999999999999}, 
-            {'MeasuredDistance': 3880.3934473490963, 'HorizontalDistance': 3878.999999999998, 'Elevation': 999.9999999999992}, 
-            {'MeasuredDistance': 4191.037938689277, 'HorizontalDistance': 4189.0, 'Elevation': 1019.9999999999997}, 
-            {'MeasuredDistance': 4518.648988563972, 'HorizontalDistance': 4515.999999999999, 'Elevation': 1039.9999999999998}, 
-            {'MeasuredDistance': 5161.959955359969, 'HorizontalDistance': 5159.0, 'Elevation': 1059.9999999999993}, 
-            {'MeasuredDistance': 5647.3721513336595, 'HorizontalDistance': 5643.999999999998, 'Elevation': 1079.9999999999995}, 
-            {'MeasuredDistance': 6760.551831349424, 'HorizontalDistance': 6757.0, 'Elevation': 1059.9999999999993}, 
-            {'MeasuredDistance': 8821.64886933672, 'HorizontalDistance': 8817.999999999996, 'Elevation': 1079.9999999999995}, 
-            {'MeasuredDistance': 9147.64886933672, 'HorizontalDistance': 9143.999999999995, 'Elevation': 1079.9999999999995}, 
-            {'MeasuredDistance': 10174.64886933672, 'HorizontalDistance': 10170.999999999995, 'Elevation': 1079.9999999999995}, 
-            {'MeasuredDistance': 11091.613972271394, 'HorizontalDistance': 11086.0, 'Elevation': 1019.9999999999997}
-            ]
-        }
-    return out[flowline_name]
-# print(get_data_flowlines(None))
-
-# profile=[1,2,3]
-# profile=1
-# print(next(iter(profile)))
