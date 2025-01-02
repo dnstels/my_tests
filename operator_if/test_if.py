@@ -1,9 +1,9 @@
 
-from operator_if.fun_if import get_result_of_number
+from operator_if.fun_if import get_result_of_number_one_string
 
 
 def test_get_result_of_number():
-    assert get_result_of_number(-1) == 'Отрицательное'
-    assert get_result_of_number(1) == 'Положительное'
-    assert get_result_of_number(0) == 'Ноль'
+    assert get_result_of_number_one_string(-1) == 'Отрицательное'
+    assert get_result_of_number_one_string(1) == 'Положительное'
+    assert get_result_of_number_one_string(0) == 'Ноль'
     
