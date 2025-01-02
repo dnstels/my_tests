@@ -1,5 +1,5 @@
 
-from Operator_IF.fun_if import get_result_of_number
+from operator_if.fun_if import get_result_of_number
 
 
 def test_get_result_of_number():
