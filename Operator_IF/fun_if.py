@@ -1,0 +1,2 @@
+def get_result_of_number(num):
+    return 'Положительное' if num>0 else 'Отрицательное' if num<0 else 'Ноль'
