@@ -1,5 +1,7 @@
 import time
 
+import pytest
+
 
 def something(duration=0.000001):
     """
@@ -23,6 +25,7 @@ def something(duration=0.000001):
 #     result = benchmark(something, 0.001)
 #     assert result == 123
 
+@pytest.mark.benchmark
 def test_my_stuff(benchmark):
     benchmark.extra_info['foo'] = 'bar'
     benchmark(time.sleep, 0.02)

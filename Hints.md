@@ -18,3 +18,7 @@
 
 Восстановить зависимости:
 `pip install -r requirements.txt`
+
+### pytest
+Запуск определенных тестов:
+`pytest [options] [filename[::function_name]]`
