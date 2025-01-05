@@ -5,5 +5,5 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "cSpell.language": "en,ru",
-    "todomd.defaultFile": "${workspaceFolder}/todo"
+    "todomd.defaultFile": "${workspaceFolder}/todo.md"
 }
