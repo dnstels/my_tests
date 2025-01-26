@@ -1,0 +1,28 @@
+.indicator > *{
+    text-align: center;
+}
+.hidden{
+    visibility: hidden;
+}
+.procent_diff_up{
+    color: green;
+}
+.procent_diff_down{
+    color: red;
+}
+
+.header_info_line{
+    text-align: right;
+    font-size: 10px;
+}
+.header_caption{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+#controls-type-graph > label{
+    margin: 0px 15px;
+}
+[type='radio']{
+    margin: 0px 10px;
+}
