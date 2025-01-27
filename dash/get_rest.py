@@ -45,10 +45,16 @@ def empty_data():
         'labor_costs':[]
     })
 
+def create_request_department(departments):
+    if departments == None: return None
+    request= ','.join([item for item in departments]) if type(departments) == list\
+        else departments
+    return quote(request)
+
 def get_LabourCost(departments):
     df=empty_data()
-    request= departments if departments == None else quote(','.join([item for item in departments]))
-    endPoint_labourCost="LabourCost" if departments==None else f"LabourCost/DepartmentCodes/{request}"
+    request= create_request_department(departments)
+    endPoint_labourCost="LabourCost" if request==None else f"LabourCost/DepartmentCodes/{request}"
     err,res=get_from(endPoint_labourCost)
     # err,df=get_fake()
     if res != None:

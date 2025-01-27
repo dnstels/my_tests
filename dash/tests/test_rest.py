@@ -17,3 +17,9 @@ def test_print_fakedata():
     # print(txt.to_json())
     res=f"""{{['weekNumberOfThePlanEndDate':]}}"""
     print(txt)
+
+@pytest.mark.parametrize("test_input,expected",[
+    (None,None),("Строка","%D0%A1%D1%82%D1%80%D0%BE%D0%BA%D0%B0"),
+    (["str1","str2"],"str1%2Cstr2"),(["str1"],"str1"),([],"")])
+def test_create_request_department(test_input,expected):
+    assert create_request_department(test_input) == expected
