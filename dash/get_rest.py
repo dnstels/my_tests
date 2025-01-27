@@ -31,12 +31,13 @@ def get_fake():
         'humanLaborCostsDays':
             [np.random.uniform(start_u, end_u)for n in range(1,54)]
     })
-    res=[f"""{{[
-         {{'weekNumberOfThePlanEndDate':{str(week)},
-         'humanLaborCostsDays':{np.random.uniform(start_u, end_u)}}}
-         ]}}""" for week in range(1,54)]
+    data=[f'''{{"weekNumberOfThePlanEndDate":{week},
+         "humanLaborCostsDays":{0 if week==1 else np.random.uniform(start_u, end_u)}}}'''
+         for week in range(1,54)]
+    
+    res=f"[{','.join(data)}]"
     # return (None,df)
-    return res
+    return None,res
 
 def empty_data():
     return pd.DataFrame({
