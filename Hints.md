@@ -34,7 +34,10 @@ git stash -m 'описание коммита'
 `[path_to\py]python -m venv .venv`
 
 Узнать путь до программы python
+Windows:
 `Get-Command python`
+Linux:
+`which python`
 
 Использовать pip:
 `python -m pip <опции pip>`
