@@ -1,14 +1,18 @@
 import calendar
 import locale
 from urllib.parse import quote
+from flask import json
 import requests
 import pandas as pd
 
 import numpy as np
 
-url = "http://serv51:8005/api/"
+url = "http://serv51:8005"
+# url = "http://localhost:8000"
 
 def get_from(endPoint,request=None,url=url):
+    endPoint=f"/api/{endPoint}"
+    # endPoint="/err500"
     try:
         response = requests.get(f'{url}{endPoint}',timeout=3)
 
@@ -16,11 +20,20 @@ def get_from(endPoint,request=None,url=url):
             err=None
             res=response.text
         else:
-            err=f"Запрос: {endPoint} -> Ошибка: {response.status_code}"
+            err_content=json.loads(response.content.decode('utf8').replace("'", '"'))
+            err=f"Запрос: {endPoint} -> Ошибка: {response.status_code} \
+                {json.dumps(err_content,ensure_ascii=False)}"
             res=None
-    except:
+    except requests.ConnectionError as e:
         res=None
-        err='Сервер данных недоступен'
+        err="Сервер данных недоступен."
+    except requests.Timeout as e:
+        res=None
+        err="Время ожидание ответа сервера данных окончено."
+    except Exception as e:
+        res=None
+        err=f"Произошла ошибка: \n\r{str(e)}"
+        print(err)
     finally:
         return (err,res)
 
@@ -37,7 +50,7 @@ def get_fake_graph_data():
 
 def empty_data():
     return pd.DataFrame({
-        'week_num':[],
+        'group_name':[],
         'labor_costs':[]
     })
 
@@ -84,11 +97,15 @@ def nums_to_month(nums):
 
 def get_ScheduledTime(departments):
     request= create_request_department_for_LabourCost(departments)
+    res=None
+    err=''
     if request=='':
-        _,df_dep=get_departments()
+        err,df_dep=get_departments()
         departments=df_dep['departmentCode'].to_list()
         request= create_request_department_for_LabourCost(departments)
-
-    err,res=get_from(f"Departments/DepartmentCodes/{request}/ScheduledTime")
-    return res if res!=None else 0
+    # res_err=err
+    if err=='' or err==None:
+        err,res=get_from(f"Departments/DepartmentCodes/{request}/ScheduledTime")
+    # res_err+=f"\n- {err}"
+    return err,res if res!=None else 0
 
