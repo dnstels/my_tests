@@ -3,7 +3,6 @@ import dash
 import flask
 import dash_bootstrap_components as dbc
 from dash import Dash, html, dcc, callback, Output, Input, ctx
-from flask import json
 import plotly.graph_objects as go
 
 from controls.indicators import WorkCount, Workload
@@ -15,19 +14,27 @@ cookie_period_type="dash period_type"
 
 app = Dash()
 
-styles = {
-    'pre': {
-        'border': 'thin lightgrey solid',
-        'overflowX': 'scroll'
-    }
-}
-
+def update_text_error(errors):
+    errors=[""]+errors
+    err_body='\n- '.join(errors)
+    txt=f"""
+### Ошибка сервера данных:
+{err_body}
+    """
+    return len(errors)>1,dcc.Markdown(txt)
 
 def get_department():
-    text,df=get_rest.get_departments()
-    return [name for name in df['departmentCode']]
+    errors=[]
+    error,df=get_rest.get_departments()
+    if error!=None:
+        errors.append(error)
+        departments=[]
+    else:
+        departments=[name for name in df['departmentCode']]
+    err_is_open,err_body=update_text_error(errors)
+    return err_is_open,err_body,departments
 
-departments=get_department()
+err_is_open,err_body,departments=get_department()
 
 today=date.today()
 yesterday = today - timedelta(days=1)
@@ -49,7 +56,7 @@ controls = dbc.Card(
                     {"label": "Несколько", "value": 1},
                 ],style={"display": "inline-block", "margin": "0px 5px"},value=[1]),
                         ])),
-        dbc.CardBody([dcc.Dropdown(departments,value=[],id='department-dropdown',
+        dbc.CardBody([dcc.Dropdown(options=departments,value=[],id='department-dropdown',
                       placeholder="Выбрать подразделение",multi=True,),
                       ],
                     )
@@ -99,7 +106,7 @@ data_row = dbc.Row(
 app.layout = html.Div( [
     html.Div(
              children=[
-    html.Img(src=r'assets/img/gpp_logo.png',width="100", height="50",
+    html.Img(src=r'assets/img/app_logo.png',width="100", height="50",
              style={'margin':'0 10px'}),
     dbc.Col([html.H5(children=[
         '''РЕСУРСНЫЙ ПЛАН ПРОИЗВОДСТВЕННЫХ ПОДРАЗДЕЛЕНИЙ ''',html.Br(),
@@ -109,16 +116,24 @@ app.layout = html.Div( [
     ], style={'display': 'flex'}),
     inform_row,
     html.Br(),
+    dbc.Alert(children=err_body, color="danger",
+            id='errors-alert',
+            dismissable=True,
+            is_open=err_is_open,
+            # duration=4000,
+    ),
     dbc.Row(id='indicators',children=[]),
     html.Br(),
     data_row,
     html.Br(),
     html.Div(id="output"),
-    html.Pre(id='click-data', style=styles['pre'])
 ],style={"padding": "10px"})
 
 @callback(
     Output(component_id='controls-and-graph', component_property='figure'),
+    Output('indicators',component_property='children'),
+    Output('errors-alert',component_property='is_open'),
+    Output('errors-alert',component_property='children'),
     [
         Input(component_id='department-dropdown', component_property='value'),
         Input('mode-department-dropdown',component_property='value'),
@@ -127,13 +142,17 @@ app.layout = html.Div( [
 )
 def update_graph(department_dropdown_value,multi_department,
                  period_type):
-    # button_id = ctx.triggered_id
     global graph_data
     global red_line_lost
+    errors=[]
     error,df=get_rest.get_LabourCost(department_dropdown_value,
                                         period_type)
+    if error!=None: errors.append(error)
+
     graph_data=df
-    red_line_lost=get_rest.get_ScheduledTime(department_dropdown_value)
+    error,red_line_lost=get_rest.get_ScheduledTime(department_dropdown_value)
+    red_line_lost = 0 if red_line_lost==None else red_line_lost
+    if error!=None: errors.append(error)
 
     layout = go.Layout(
         plot_bgcolor='#fff',
@@ -149,13 +168,12 @@ def update_graph(department_dropdown_value,multi_department,
     )
 
     fig = go.Figure(layout = layout)
-    # fig.update_layout(clickmode='event+select')
     fig.add_trace(go.Bar(
             name="Трудозатраты, чел.дн",
             showlegend=True,
             x=graph_data['group_name'], y=graph_data['labor_costs'],
             marker_color='#88CBFF',
-            visible="legendonly"
+            # visible="legendonly"
         ),
     )
     fig.add_trace(go.Scatter(
@@ -169,19 +187,23 @@ def update_graph(department_dropdown_value,multi_department,
             marker_color='#6666FF',
         )
     )
-    fig.add_hline(name="ФРВ",y=red_line_lost, line_color='red',showlegend=True,)
-    
+    fig.add_hline(name="ФРВ",y=float(red_line_lost),
+                  line_color='red',#line_dash="dot",
+                  annotation_text=f"ФРВ {red_line_lost}",
+                  annotation_position="top left",
+                  showlegend=True,
+    )
+
     if period_type==0: fig.update_xaxes(title_text='Неделя',gridcolor='#EFDECD')
     else: fig.update_xaxes(title_text="Месяц",tickangle=45,gridcolor='#EFDECD')
     
     fig.update_yaxes(title_text='Трудозатраты',gridcolor='#EFDECD')
 
-    red_line_lost = 0 if red_line_lost==None else red_line_lost
 
     value_cookie_department=','.join(department_dropdown_value) \
         if multi_department.__contains__(1) else department_dropdown_value
 
-    if value_cookie_department == None:
+    if value_cookie_department == '' or value_cookie_department == None:
         dash.callback_context.response.set_cookie(
             cookie_department,'', expires=0)
     else:
@@ -190,8 +212,10 @@ def update_graph(department_dropdown_value,multi_department,
     
     dash.callback_context.response.set_cookie(
             cookie_period_type,str(period_type))
+    
+    err_is_show,err_text=update_text_error(errors)
 
-    return fig
+    return fig,update_indicators(red_line_lost),err_is_show,err_text
 
 @app.callback(
         [
@@ -205,7 +229,6 @@ def set_startup_value_or_mode_department_dropdown(multi_department_in):
     cookies=flask.request.cookies
     period_type=int(cookies[cookie_period_type]) \
         if cookie_period_type in cookies else 0
-
     if ctx.triggered_id == "mode-department-dropdown":
         if multi_department_in.__contains__(1):
             dash.callback_context.response.set_cookie(
@@ -216,7 +239,7 @@ def set_startup_value_or_mode_department_dropdown(multi_department_in):
             dash.callback_context.response.set_cookie(
                 cookie_multi_department,'', expires=0)
             department_dropdown_value=''
-            department_dropdown_multi=False  
+            department_dropdown_multi=False
         return department_dropdown_value, \
             multi_department_in, department_dropdown_multi, period_type
     else:
@@ -238,13 +261,10 @@ def set_startup_value_or_mode_department_dropdown(multi_department_in):
 def display_value(value):
     return f"Selected value: {','.join(value)if type(value)==list else value}"
 
-@app.callback(
-        Output('indicators',component_property='children'),
-        Input("department-dropdown", "value"))
-def update_indicators(value):
+def update_indicators(fwt):
     year=datetime.now().year
     pre_year=year-1
-    worker_count='-'
+    worker_count='-' if fwt==None else str(int(int(fwt)/5))
     procent='-'
     pre_procent='-'
     diff_procent=0
@@ -253,18 +273,6 @@ def update_indicators(value):
         dbc.Col([Workload(year,procent,diff_procent),],width={"size": 2, "order": 2},),
         dbc.Col([WorkCount(worker_count)],width={"size": 2, "order": 3},),
     ]
-
-
-
-
-
-        
-@callback(
-    Output('click-data', 'children'),
-    Input('controls-and-graph', 'restyleData'))
-def display_click_data(clickData):
-    print(clickData)
-    return json.dumps(clickData, indent=2)
 
 
 if __name__ == '__main__':
