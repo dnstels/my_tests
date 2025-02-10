@@ -1,0 +1,9 @@
+{
+    "name": "Highlight code",
+        "nameLocale": {
+            "de": "Code hervorheben",
+            "es": "Resaltar el código",
+            "fr": "Code en surbrillance",
+            "ru": "Подсветка кода"
+        }
+}

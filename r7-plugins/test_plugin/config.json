@@ -1,0 +1,25 @@
+{
+    "baseUrl": "",
+    "guid": "asc.{FFE1F462-1EA2-4391-990D-4CC84940B754}",
+    "name": "Тестовый plugin",
+    "variations": [
+        {
+            "buttons": [
+                { "text": "OK", "primary": true  },
+                { "text": "Cancel", "primary": false }
+            ],
+            "description": "test_plugin",
+            "EditorsSupport": ["word", "cell", "slide"],
+            "icons": ["icon.png", "icon@2x.png"],
+            "initData": "",
+            "initDataType": "ole",
+            "initOnSelectionChanged": true,
+            "isInsideMode": false,
+            "isModal": true,
+            "isUpdateOleOnResize": true,
+            "isViewer": true,
+            "isVisual": true,
+            "url": "index.html"
+        }
+    ]
+}

@@ -1,12 +1,12 @@
 import io
-import time
-from urllib.request import Request
-from fastapi import Depends, FastAPI, HTTPException, Response
+from typing import List
+
+from fastapi import Depends, FastAPI, File, HTTPException, Request, Response, UploadFile
 from fastapi.responses import RedirectResponse, StreamingResponse
-# from sqlalchemy.orm import Session
 import uvicorn
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from tempfile import NamedTemporaryFile
 
 app = FastAPI()
 
@@ -19,6 +19,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def save_temporary(upload_file):
+    with NamedTemporaryFile(
+        delete=False, dir=".\\tmpdir", suffix=f"_{upload_file.filename}"
+    ) as file_path:
+        with open(file_path.name, "wb") as f:
+            f.write(upload_file.file.read())
+    return file_path.name
+
+def generate_file_response(filepath=None):
+    if filepath:
+        with open(filepath, "rb") as f:
+            contents = f.read()  # file contents could be already fully loaded into RAM
+    else:
+        with io.BytesIO(b"some initial binary data: \x00\x01") as some_stream:
+            contents=some_stream.read()
+    headers = {
+        "Content-Disposition": "attachment; filename=file.bin"
+    }
+    return headers,contents
+    
+
 @app.get("/",include_in_schema=False)
 def get_root():
     return RedirectResponse(url='/docs')
@@ -27,16 +48,9 @@ def get_root():
 async def first():
     return {"Hello": "World"}
 
-# @app.exception_handler(Exception)
 @app.get("/err500")
-# async def server_error_handler(request: Request, exc: Exception):
 async def server_error_handler():
     exc="Текст ошибки"
-    # time.sleep(5)
-    # return JSONResponse(
-    #     status_code=500,
-    #     content={"detail": str(exc)},
-    # )
     raise HTTPException(status_code=500,detail=exc)
 
 @app.get("/ping")
@@ -45,23 +59,32 @@ async def ping():
 
 @app.get('/get_file_as_stream')
 def getfile_as_stream():
-    # with open(filepath, "rb") as f:
-    #     contents = f.read()  # file contents could be already fully loaded into RAM
-
-    # some_stream= io.BytesIO(b"some initial binary data: \x00\x01")
-    with io.BytesIO(b"some initial binary data: \x00\x01") as some_stream:
-        some_data=some_stream.read()
-
-    # headers = {'Content-Disposition': f'attachment; filename="{filename}"'}
-    # return Response(contents, headers=headers, media_type='audio/mp3')
-
-    headers = {
-        "Content-Disposition": "attachment; filename=file.bin"
-    }
-
-    # return StreamingResponse(some_stream, media_type="application/octet-stream")
+    headers,some_data=generate_file_response()
     return Response(content=some_data, media_type="application/octet-stream", headers=headers)
 
+@app.post("/convert")
+# async def convert(myfile: UploadFile):
+async def convert(files: List[UploadFile] = File(...)):
+    f1=files[0]
+    print(f1.filename)
+    myfile=f1
+    file=save_temporary(myfile)
+    headers,content=generate_file_response(filepath=file)
+    # return file
+    # return Response(content=myfile.file, media_type=myfile.content_type, headers=myfile.headers)
+    return Response(content=content, media_type="application/octet-stream", headers=headers)
+    # return "Ok"
+
+
+@app.post("/convert_2")
+def read_item_via_request_body(request: Request):
+    
+    print(request)
+    form_data = request.form()
+    
+    # ... Data management operations here ...
+    
+    return form_data
+
 if __name__ == "__main__":
-    # uvicorn.run(app, host="0.0.0.0", port=8000)
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)
