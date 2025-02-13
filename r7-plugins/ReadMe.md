@@ -1,1 +1,0 @@
-C:\Users\User\AppData\Local\R7-Office\Editors\data\sdkjs-plugins\{FFE1F462-1EA2-4391-990D-4CC84940B754}
