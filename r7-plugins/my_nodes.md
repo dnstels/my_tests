@@ -1,3 +1,4 @@
+
 [Пример пути до установленного пользовательского плагина](C:\Users\User\AppData\Local\R7-Office\Editors\data\sdkjs-plugins\{FFE1F462-1EA2-4391-990D-4CC84940B754})
 
 [How to set a value to a file input in HTML to a client side disk file system path?](https://stackoverflow.com/questions/1696877/how-to-set-a-value-to-a-file-input-in-html-to-a-client-side-disk-file-system-pat)
@@ -40,3 +41,5 @@
         this.executeCommand("close", '');
     };
 ```
+
+[How to run a cron job inside a docker container?](https://stackoverflow.com/questions/37458287/how-to-run-a-cron-job-inside-a-docker-container)
