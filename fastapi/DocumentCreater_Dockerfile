@@ -1,0 +1,12 @@
+FROM registry.red-soft.ru/ubi7/python-38-minimal
+
+USER root
+
+#ADD yum.repos.d/ /etc/yum.repos.d/
+#RUN dnf makecache
+
+RUN yum -y install glibc libcurl libxml2 dejavu-lgc-sans-fonts dejavu-lgc-sans-mono-fonts dejavu-lgc-serif-fonts dejavu-sans-fonts dejavu-sans-mono-fonts dejavu-serif-fonts libreoffice-opensymbol-fonts
+
+ADD r7-office-documentconstructor.x86_64.rpm /opt/
+RUN rpm -i /opt/r7-office-documentconstructor.x86_64.rpm
+RUN rm -f /opt/r7-office-documentconstructor.x86_64.rpm
