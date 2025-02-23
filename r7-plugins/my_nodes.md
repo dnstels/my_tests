@@ -6,6 +6,8 @@
 
 [Плагин для Р7 'Вложенные файлы'](https://nct.r7-office.ru/api/v1/link?uid=ba59b886-ff07-4028-9935-17d566f6edc3_341327&download=true)
 
+[Исходный код плагина 'Вложенные файлы'](https://github.com/VNexsus/EmbeddedFiles-plugin/tree/main)
+
 ```javascript
 (function (window, undefined) {
     window.Asc.plugin.init = function () {
