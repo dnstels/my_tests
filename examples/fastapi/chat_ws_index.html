@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Чат-бот</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/docs.css" rel="stylesheet">
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/marked.umd.js"></script>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+ <h1 id="timer">00:00:00</h1>
+  <!-- <button id="startBtn">Старт</button>
+  <button id="pauseBtn" disabled>Пауза</button>
+  <button id="resetBtn" disabled>Сброс</button> -->
+
+  <script>
+    let timer = document.getElementById('timer');
+let startBtn = document.getElementById('startBtn');
+let pauseBtn = document.getElementById('pauseBtn');
+let resetBtn = document.getElementById('resetBtn');
+
+let seconds = 0;
+let minutes = 0;
+let hours = 0;
+let interval;
+
+function updateTime() {
+  seconds++;
+  if (seconds === 60) {
+    minutes++;
+    seconds = 0;
+  }
+  if (minutes === 60) {
+    hours++;
+    minutes = 0;
+  }
+  timer.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+function Start(){
+   interval = setInterval(updateTime, 1000);
+//   startBtn.disabled = true;
+//   pauseBtn.disabled = false;
+//   resetBtn.disabled = false; 
+nodes = document.getElementById('giv-generate').getElementsByTagName('*');
+    for(var i = 0; i < nodes.length; i++){
+        nodes[i].disabled = true;
+    }
+}
+
+function Stop(){
+    clearInterval(interval);
+    // startBtn.disabled = false;
+    // pauseBtn.disabled = true;
+
+    nodes = document.getElementById('giv-generate').getElementsByTagName('*');
+    for(var i = 0; i < nodes.length; i++){
+        nodes[i].disabled = false;
+    }
+}
+
+function Reset(){
+//   clearInterval(interval);
+  Stop();
+  seconds = 0;
+  minutes = 0;
+  hours = 0;
+  timer.textContent = '00:00:00';
+//   startBtn.disabled = false;
+//   pauseBtn.disabled = true;
+//   resetBtn.disabled = true;
+}
+
+// startBtn.addEventListener('click', () => {
+//     Start();
+// });
+
+// pauseBtn.addEventListener('click', () => {
+//   Stop();
+// });
+
+// resetBtn.addEventListener('click', () => {
+//   Reset();
+// });
+  </script>
+
+    <div class="chat-container" id="giv-generate">
+        <!-- <input type="file" class="btn btn-primary" accept=".patch,.diff"  id="fileInput"> -->
+         <div class="row g-3" style="padding: 10px;">
+        <label for="fileInput" class="form-label">
+            В командной строке <div style="display: inline;color: blue;">Git Bash</div> введете команды: 
+            <code><pre>  
+                git add -i filepath/filename
+                git diff --staged > file_name.patch
+            </pre></code>
+            <div style="margin-top: -20px;">и загрузите сюда полученный файл</div>
+        </label>
+        <input class="form-control form-control-sm" type="file" id="fileInput" accept=".patch,.diff">
+        <!-- <label class="input-group-text" for="inputGroupFile02">Загрузка</label> -->
+        <button type="button" class="btn btn-primary" onclick="Generate_stream()">Генерировать</button>
+        </div>
+        <hr>
+            <code>
+            <div id="chat-history"></div>
+            </code>
+    </div>
+
+    <!-- Модальное окно -->
+    <div class="modal fade" id="ErrorPopup" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Ошибка</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body" id="Error_text"></div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            if (!message) return;
+            // Добавляем сообщение пользователя в историю
+            addToChat(message, 'user');
+            // console.log(JSON.stringify({ message }));
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+            // console.log(response);
+            const data = await response.json();
+            // console.log(data);
+            addToChat(data.reply, 'bot');
+            input.value = '';  // Очищаем поле ввода
+        }
+        
+        function addToChat(text, sender) {
+            const history = document.getElementById('chat-history');
+            const hr = document.createElement('hr');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            // messageDiv.textContent = text;
+            // messageDiv.innerHTML = text;
+            // messageDiv.innerHTML = marked.parse('# Marked in browser\n\nRendered by **marked**.');
+            // messageDiv.innerHTML = marked.parse(text);
+            messageDiv.innerHTML = text;
+            console.log(text)
+            history.appendChild(messageDiv);
+            history.appendChild(hr);
+        }
+
+        function addToChat(text, sender) {
+            const history = document.getElementById('chat-history');
+            const hr = document.createElement('hr');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            // messageDiv.textContent = text;
+            // messageDiv.innerHTML = text;
+            // messageDiv.innerHTML = marked.parse('# Marked in browser\n\nRendered by **marked**.');
+            // messageDiv.innerHTML = marked.parse(text);
+            messageDiv.innerHTML = text;
+            console.log(text)
+            history.appendChild(messageDiv);
+            history.appendChild(hr);
+        }
+        
+        async function Generate() {
+            const fileInput = document.getElementById('fileInput'); // получаем элемент input для загрузки файла
+            console.log(fileInput.files)
+            if(fileInput.files.length == 0){
+                return;
+            }  
+            
+            const file = fileInput.files[0];
+
+            if(file.size<1){
+                let myModal = new bootstrap.Modal(document.getElementById('ErrorPopup'));
+                document.getElementById('Error_text').textContent="Обработка пустого файла не имеет смысла";
+                myModal.show();
+                return;
+            }
+            if(file.size>3072){
+                let myModal = new bootstrap.Modal(document.getElementById('ErrorPopup'));
+                document.getElementById('Error_text').textContent="Файл размера изменений в не должен превышать 3072байт (3KB)";
+                myModal.show();
+                return;
+            }
+
+            url = '/uploadfile';
+
+            Reset();
+            Start();
+
+            const onSubmit = async (url, file) => {
+                // e.preventDefault();
+                const formData = new FormData();
+                formData.append("file", file, file.name);
+                response = await fetch(url, {
+                    method: "POST",
+                    body: formData,
+                })
+                Stop();
+
+                if (response.ok) {  
+                    const data = await response.json();  
+                    // console.log('File uploaded successfully:', data.data);
+                    addToChat(data.data,'bot')  
+                } else {  
+                    // console.log('Error occurred during file upload:', response.status);  
+                }
+            };
+            
+            onSubmit(url, file);
+        }
+    </script>
+
+    <script>
+        async function Generate_stream() {
+            const fileInput = document.getElementById('fileInput'); // получаем элемент input для загрузки файла
+            console.log(fileInput.files)
+            if(fileInput.files.length == 0){
+                return;
+            }  
+            
+            const file = fileInput.files[0];
+
+            if(file.size<1){
+                let myModal = new bootstrap.Modal(document.getElementById('ErrorPopup'));
+                document.getElementById('Error_text').textContent="Обработка пустого файла не имеет смысла";
+                myModal.show();
+                return;
+            }
+            let max_size = 10240;
+            if(file.size>max_size){
+                let myModal = new bootstrap.Modal(document.getElementById('ErrorPopup'));
+                document.getElementById('Error_text').textContent=`Файл размера изменений в не должен превышать ${max_size}байт (3KB)`;
+                myModal.show();
+                return;
+            }
+
+            let reader = new FileReader();
+
+            reader.readAsText(file);
+
+            reader.onload = function() {
+                console.log(reader.result);
+                req(reader.result)
+            };
+
+            // url = '/uploadfile';
+
+        }
+    </script>
+
+<script>
+    function req(text){
+        let client_id = Date.now();
+        var ws = new WebSocket(`ws://localhost:5000/ws/${client_id}`);
+        let isClose = false;
+        console.log(text);
+
+        var response = ''
+        
+        const history = document.getElementById('chat-history');
+        const hr = document.createElement('hr');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message bot`;
+        // messageDiv.textContent = text;
+        // messageDiv.innerHTML = text;
+        // messageDiv.innerHTML = marked.parse('# Marked in browser\n\nRendered by **marked**.');
+        // messageDiv.innerHTML = marked.parse(text);
+        
+        ws.onmessage = function(event) {
+            // var messages = document.getElementById('messages')
+            // //var message = document.createElement('li')
+            // var content = document.createTextNode(event.data)
+            // //message.appendChild(content)
+            // messages.appendChild(content)
+            //addToChat(event.data,'bot')
+            
+            //response = response + event.data
+            response = event.data
+            console.log(response)
+            messageDiv.innerHTML = response;
+            history.appendChild(messageDiv);
+        };
+        
+        history.appendChild(hr);
+        
+        ws.onopen = () => { 
+            Reset();
+            Start();
+            ws.send(text);
+        }
+        
+        ws.onclose = function(event) {
+            isClose = true;
+            Stop();
+        }
+    }
+    /*var client_id = Date.now()
+    document.querySelector("#ws-id").textContent = client_id;
+    var ws = new WebSocket(`ws://localhost:5000/ws/${client_id}`);
+    var isClose = false;
+    ws.onmessage = function(event) {
+        var messages = document.getElementById('messages')
+        //var message = document.createElement('li')
+        var content = document.createTextNode(event.data)
+        //message.appendChild(content)
+        messages.appendChild(content)
+    };
+    function sendMessage(event) {
+        if(isClose){
+            var client_id = Date.now()
+            ws = new WebSocket(`ws://localhost:5000/ws/${client_id}`);
+            }
+        var input = document.getElementById("messageText")
+        ws.send('input.value')
+        input.value = ''
+        //event.preventDefault()
+    }
+    ws.onclose = function(event) {
+        isClose = true;*/
+        /*if (event.wasClean) {
+            alert('Соединение закрыто чисто');
+        } else {
+            alert('Обрыв соединения'); // например, "убит" процесс сервера
+        }
+        alert('Код: ' + event.code + ' причина: ' + event.reason);
+        */
+    //};
+</script>
+
+
+</body>
+</html>
