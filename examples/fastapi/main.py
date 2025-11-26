@@ -1,4 +1,3 @@
-
 import os
 import io
 from fastapi.exceptions import RequestValidationError
@@ -39,6 +38,11 @@ from rst2html import rst2html
 import markdown
 
 from openai import OpenAI
+import aiohttp
+import json 
+import openai_async
+from openai import AsyncOpenAI
+
 
 class Item(BaseModel):
     message: str
@@ -65,26 +69,43 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
+def messages_1(data):
+    return [
+            # {"role": "system", "content": "Ты технический писатель. Пиши только на русском языке. Описывай только суть."},
+            {"role": "user", "content": f"""Ты технический писатель. Пиши только на русском языке. Описывай только суть.
+Напиши не вдаваясь в подробности отформатированное markdown сообщение на русском языке для git commit, нужно только описание изменения кода используя результат команды git diff, 
+'-' в начале сроки означает что строка удалена '+' что строка добавлена, определи изменения:
+```
+{data}
+```
+используй шаблон вывода:
+```
+{{Краткий заголовок, что сделано}}
+
+{{Описание изменений}}
+```
+
+"""}
+
+            ]
+def messages_2(data):
+    return [
+            {"role": "system", "content": "You're a technical writer. Write only in Russian. Describe only the essence."},
+            # {"role": "user", "content": "Напиши не вдаваясь в подробности и без информации о том что ты понял отформатированное сообщение на русском языке для git commit, нужно только описание изменения кода используя результат команды git diff, определи изменения"},
+            {"role": "system", "content": "Прочитай результат команды git diff, определи изменения"},
+            {"role": "system", "content":"""Пиши по‑русски, просто и по делу. 
+             Соблюдай структуру: заголовок (до 80 знаков), текст (3–5 коротких абзацев), итог (1 строка). 
+             Держи нейтрально‑деловой тон и фактуру. Выдай только указанные блоки в указанном порядке.
+             """},
+            {"role": "user", "content": f"{data}"},
+            ]
+
 def messages(data):
     return [
-            {"role": "system", "content": "Ты технический писатель. Пиши только на русском языке. Описывай только суть."},
-            {"role": "user", "content": f"""Пожалуйста, напишите 
-                не вдаваясь в подробности отформатированное markdown сообщение 
-                на русском языке для git commit,
-                используя результат команды git diff:
-                ```
-                {data}
-                ```
-                используй шаблон вывода:
-
-                ```
-                {{Краткий заголовок}}
-
-                {{Описание изменений}}
-                ```
-                
-                """}
-
+            {"role": "system", "content": "You're a technical writer. Write only in Russian. Describe only the essence."},
+            {"role": "user", "content": f"{data}"},
+            {"role": "user", "content": "Напиши не вдаваясь в подробности отформатированное сообщение на русском языке для git commit, нужно только описание изменения кода используя результат команды git diff, определи изменения"},
+            {"role": "user", "content":"Выведи ответ в виде двух блоков: Краткий заголовок, что сделано, Описание изменений"}
             ]
 
 @asynccontextmanager
@@ -163,17 +184,78 @@ def create_app():
         user_message = item.message
         return JSONResponse({"reply": user_message})
     
-    def generate_response(data):
-        client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
-        completion = client.chat.completions.create(
-            model="local-model", # this field is currently unused
-            messages=messages(data),
-            temperature = 0.8,
-            # max_tokens = 100,
-            stream = False
-            )
+    async def generate_response(data):
+        client = AsyncOpenAI(
+            base_url="http://srt-w000007.samba.gazpromproject.ru:8888/v1", 
+            api_key="not-needed",
+            timeout= 90
+            # timeout=2,
+            # payload={
+            #     "model": "local-model",
+            #     "messages": [{"role": "user", "content": "Hello!"}],
+            # },
+        )
+        try:
+            response  = await client.chat.completions.create(
+                model="local-model", # this field is currently unused
+                messages=messages_2(data),
+                temperature = 0.5,
+                # max_tokens = 100,
+                stream = False
+                )
+            print(response.choices[0].message.content)
+            return response.choices[0].message.content
+        except :
+            print("Request timed out.")
+            return "Request timed out."
 
-        return completion.choices[0].message.content
+    async def generate_response_2(data):
+        # client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
+        # client = OpenAI(base_url="http://srt-w000007.samba.gazpromproject.ru:8888/v1", api_key="not-needed")
+        # completion = client.chat.completions.create(
+        #     model="local-model", # this field is currently unused
+        #     messages=messages_2(data),
+        #     temperature = 0.5,
+        #     # max_tokens = 100,
+        #     stream = False
+        #     )
+
+        # return completion.choices[0].message.content
+         # URL сервера
+            server_url = "http://srt-w000007.samba.gazpromproject.ru:8888/completion"
+
+            # Данные для запроса
+            payload = {
+                "prompt": f"""Ты технический писатель. Пиши только на русском языке. Описывай только суть.
+Напиши не вдаваясь в подробности отформатированное markdown сообщение на русском языке для git commit, нужно только описание изменения кода используя результат команды git diff, 
+'-' в начале сроки означает что строка удалена '+' что строка добавлена, определи изменения:
+```
+{data}
+```
+используй шаблон вывода:
+```
+{{Краткий заголовок, что сделано}}
+
+{{Описание изменений}}
+```
+
+""",  # Ваш промпт
+                # "n_predict": 200,  # Максимальное количество токенов для генерации
+                "temperature": 0.5,  # Параметр случайности (0.1-1.0)
+                # "stop": ["\n", "###"]  # Строки, при которых генерация останавливается
+            }
+
+            async with aiohttp.ClientSession() as session:
+                async with session.post(server_url, json=payload) as response:
+            # Запрос на сервер  
+            # response = requests.post(server_url, json=payload)
+                    result_txt = await response.text()
+                    print(result_txt)
+            # Парсим ответ
+            # result = response.json()
+            result = json.loads(result_txt)
+            completion = result['content']
+            return completion
     
     def generate_response_as_stream(data):
         client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
@@ -203,7 +285,7 @@ def create_app():
         # print(file.filename)
         data = file.file.read()
         
-        data_out = generate_response(data)
+        data_out = await generate_response(data)
         html = markdown.markdown(data_out.replace('```markdown','').replace('```',''))
         html1, warning = rst2html(data_out)
         return {
@@ -211,52 +293,68 @@ def create_app():
             "data":  html
             }
     
+    @app.post("/uploadfile_ci/")
+    async def create_upload_files(
+        file: Annotated[
+            UploadFile, File(description="File as UploadFile")
+        ],
+    ):
+        # print(file.filename)
+        data = file.file.read()
+        
+        data_out = await generate_response(data)
+        return data_out.replace('```markdown','').replace('```','')
+    
     import time
+    import requests
     @app.websocket("/ws/{client_id}")
     async def websocket_endpoint(websocket: WebSocket, client_id: int):
         await manager.connect(websocket)
         try:
-            # while True:
-                data = await websocket.receive_text()
-                # print(data)
-                
-                # await manager.send_personal_message(f"You wrote: {data}", websocket)
-                # await manager.broadcast(f"Client #{client_id} says: {data}")
-                # await manager.send_personal_message("qwer", websocket)
+            data = await websocket.receive_text()
+            # # client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
+            # client = OpenAI(base_url="http://srt-w000007.samba.gazpromproject.ru:8888/v1", api_key="not-needed")
+            # completion = client.chat.completions.create(
+            #     model="local-model", # this field is currently unused
+            #     messages=messages_2(data),
+            #     temperature = 0.5,
+            #     # max_tokens = 100,
+            #     stream = True
+            #     )
+            # URL сервера
+            server_url = "http://srt-w000007.samba.gazpromproject.ru:8888/completion"
 
-                # for i in data:
-                #     time.sleep(0.1)
-                #     await manager.send_personal_message(i, websocket)
+            # Данные для запроса
+            payload = {
+                "prompt": "Я люблю есть",  # Ваш промпт
+                "n_predict": 200,  # Максимальное количество токенов для генерации
+                "temperature": 0.2,  # Параметр случайности (0.1-1.0)
+                "stop": ["\n", "###"]  # Строки, при которых генерация останавливается
+            }
 
-                client = OpenAI(base_url="http://localhost:1234/v1", api_key="not-needed")
-                completion = client.chat.completions.create(
-                    model="local-model", # this field is currently unused
-                    messages=messages(data),
-                    temperature = 1.0,
-                    # max_tokens = 100,
-                    stream = True
-                    )
-                
-                # if(stream):
-                # # Process streaming response
-                output = io.StringIO()
-                for chunk in completion:
-                    if chunk.choices[0].delta.content:
-                        print(chunk.choices[0].delta.content, end="")
-                        print(chunk.choices[0].delta.content, file=output, end="")
-                        contents = output.getvalue().replace('```markdown','').replace('```','')
-                        await manager.send_personal_message(markdown.markdown(contents), websocket)
-                        # await manager.send_personal_message(markdown.markdown(chunk.choices[0].delta.content), websocket)
-                        # yield chunk.choices[0].delta.content
+            # Запрос на сервер  
+            response = requests.post(server_url, json=payload)
 
-                output.close()
-                await manager.disconnect(websocket)
+            # Парсим ответ
+            result = response.json()
+            completion = result['content']
+            
+            output = io.StringIO()
+            for chunk in completion:
+                if chunk.choices[0].delta.content:
+                    print(chunk.choices[0].delta.content, end="")
+                    print(chunk.choices[0].delta.content, file=output, end="")
+                    contents = output.getvalue().replace('```markdown','').replace('```','')
+                    await manager.send_personal_message(markdown.markdown(contents), websocket)
+
+            output.close()
+            await manager.disconnect(websocket)
         except WebSocketDisconnect:
             await manager.disconnect(websocket)
-            await manager.broadcast(f"Client #{client_id} left the chat")
     
     async def fake_video_streamer():
         for i in range(10):
+            time.sleep(0.5)
             yield "some fake video bytes"
 
     return app
